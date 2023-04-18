@@ -46,7 +46,7 @@ struct GameObject {
 	void	setPos(int pos) { this->pos = pos; } // setter
 
 	// 주소 정보를 넘겨줌 -> const를 붙이지 않으면 고쳐도 되는 정보로 오인할 수 있음.
-	// 그래서 다른 데서 사용하다가 동적 생성해서 원래 정보가 날라갈 수 있음.
+	// 그래서 다른 데서 사용하다가 동적 생성해서 원래 정보가 날라갈 수 있음 > 
 	// 그래서 고칠 수 없도록 const를 붙여줌.
 	const char* getShape() const { return this->shape;  } // getter
 	void	setShape(const char* shape) { strcpy(this->shape, shape); } // setter
