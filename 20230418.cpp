@@ -25,6 +25,8 @@
 // GameObject 먼저 정의하고 Canvas 정의 -> Canvas 선언해주기
 struct Canvas;
 struct GameObject {
+	// public&private 써줄 때 변수는 최대한 private로 해주고 함수는 public으로 해준다.
+	// 변수 정보에 대한 접근은 함수로 접근하도록 설계해준다.
 	char* shape;
 	int		pos;
 	bool	visible;
