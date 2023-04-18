@@ -46,7 +46,7 @@ struct GameObject {
 	void	setPos(int pos) { this->pos = pos; } // setter
 
 	// 주소 정보를 넘겨줌 -> const를 붙이지 않으면 고쳐도 되는 정보로 오인할 수 있음.
-	// 그래서 다른 데서 사용하다가 동적 생성해서 원래 정보가 날라갈 수 있음 > 
+	// 그래서 다른 데서 사용하다가 동적 생성해서 원래 정보가 날라갈 수 있음 > 메모리릭
 	// 그래서 고칠 수 없도록 const를 붙여줌.
 	const char* getShape() const { return this->shape;  } // getter
 	void	setShape(const char* shape) { strcpy(this->shape, shape); } // setter
@@ -119,6 +119,8 @@ void GameObject::draw(Canvas& canvas) const { canvas.draw(shape, pos, visible); 
 
 // player
 struct Player {
+	// GameObject를 가져오면 GameObject가 가진 소멸자함수도 자연스럽게 넘어오기 때문에
+	// 추가적으로 소멸자 함수는 넣어줄 필요가 없다.
 	GameObject gameObject;
 
 	Player(const char* shape, int pos, bool visible) : gameObject(shape, pos, visible)
