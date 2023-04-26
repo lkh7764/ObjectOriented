@@ -1,0 +1,4 @@
+﻿  20230425.cpp
+C:\Users\LimKyungHwa\source\repos\20230425_middle2\20230425_middle2\20230425.cpp(38,27): warning C4305: '초기화 중': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\LimKyungHwa\source\repos\20230425_middle2\20230425_middle2\20230425.cpp(39,30): warning C4305: '초기화 중': 'double'에서 'float'(으)로 잘립니다.
+  20230425_middle2.vcxproj -> C:\Users\LimKyungHwa\source\repos\20230425_middle2\Debug\20230425_middle2.exe
