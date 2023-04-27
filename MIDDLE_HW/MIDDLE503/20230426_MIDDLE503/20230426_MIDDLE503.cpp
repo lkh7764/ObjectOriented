@@ -59,6 +59,7 @@ void problem1() {
 
 
 // problem2
+struct GameObject;
 struct Canvas {
 	char* frameBuffer;
 	int size;
@@ -73,14 +74,7 @@ struct Canvas {
 		frameBuffer[size] = '\0';
 	}
 
-	void draw(const char* shape, int pos) {
-		for (int i = 0; i < strlen(shape); i++) {
-			if (pos + i < 0) continue;
-			if (pos + i > size - 1) continue;
-
-			frameBuffer[pos + i] = shape[i];
-		}
-	}
+	void draw(const GameObject&);
 
 	void render() const {
 		printf("%s\r", frameBuffer);
@@ -108,7 +102,7 @@ struct GameObject {
 	int getPos() const { return pos; }
 	void setPos(int pos) { this->pos = pos; }
 
-	void draw(Canvas& canvas) const { canvas.draw(shape, pos); }
+	void draw(Canvas& canvas) const { canvas.draw(*this); }
 
 	~GameObject() {
 		delete[] shape;
@@ -117,13 +111,26 @@ struct GameObject {
 	}
 };
 
+void Canvas::draw(const GameObject& obj) {
+	for (int i = 0; i < strlen(obj.shape); i++) {
+		if (obj.pos + i < 0) continue;
+		if (obj.pos + i > size - 1) continue;
+
+		frameBuffer[obj.pos + i] = obj.shape[i];
+	}
+}
+
 struct Mirror : public GameObject {
 
 	Mirror(int pos) : GameObject("|", pos) {}
 
 	bool isColliding(const int pos) {
-		if(pos>=this->pos && pos<=(this->pos + strlen(shape))) return true;
+		if (pos >= this->pos && pos <= (this->pos + strlen(shape))) return true;
 		return false;
+	}
+
+	void draw(Canvas& canvas) {
+		canvas.draw(*this);
 	}
 
 	~Mirror() {}
@@ -150,11 +157,12 @@ struct Bullet : public GameObject {
 			direction = 0;
 			setShape(">");
 		}
-
 		damaged();
 	}
 
 	void damaged() { hp -= 1; }
+
+	void draw(Canvas& canvas) { canvas.draw(*this); }
 
 	void update(Mirror& m1, Mirror& m2) {
 		move();
@@ -180,7 +188,7 @@ struct Player : public GameObject {
 		if (direction == 0) bulletShape = new char[] { ">" };
 		else bulletShape = new char[] { "<" };
 
-		int pos;
+		int pos = 0;
 		if (direction == 0) pos = getPos() + getShapeSize() - 1;
 		else getPos();
 
@@ -191,6 +199,8 @@ struct Player : public GameObject {
 
 		return bullet;
 	}
+
+	void draw(Canvas& canvas) { canvas.draw(*this); }
 
 	void update(Canvas& canvas) {
 		frameCount++;
@@ -218,9 +228,9 @@ void problem2() {
 	while (true) {
 		canvas->clear();
 
-		player->draw(*canvas);
 		mirror1->draw(*canvas);
 		mirror2->draw(*canvas);
+		player->draw(*canvas);
 
 		player->update(*canvas);
 

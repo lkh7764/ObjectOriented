@@ -23,29 +23,18 @@ struct Canvas {
 
 	int getSize() { return size; }
 
-	//void draw(const GameObject& obj)
-	//{
-	//	if (obj.visible == false) return;
+	void draw(const GameObject& obj);
+	//void draw(const char* shape, int pos, bool visible) {
+	//	if (visible == false) return;
 
-	//	for (int i = 0; i < strlen(obj.shape); i++)
+	//	for (int i = 0; i < strlen(shape); i++)
 	//	{
-	//		if (obj.pos + i < 0) continue;
-	//		if (obj.pos + i > size - 1) continue;
+	//		if (pos + i < 0) continue;
+	//		if (pos + i > size - 1) continue;
 
-	//		frameBuffer[obj.pos + i] = obj.shape[i];
+	//		frameBuffer[pos + i] = shape[i];
 	//	}
 	//}
-	void draw(const char* shape, int pos, bool visible) {
-		if (visible == false) return;
-
-		for (int i = 0; i < strlen(shape); i++)
-		{
-			if (pos + i < 0) continue;
-			if (pos + i > size - 1) continue;
-
-			frameBuffer[pos + i] = shape[i];
-		}
-	}
 
 	void render() const {
 		printf("%s\r", frameBuffer);
@@ -83,8 +72,8 @@ struct GameObject {
 	GameObject* me() { return this; }
 
 	void draw(Canvas& canvas) { 
-		// canvas.draw(*me());
-		canvas.draw(shape, pos, visible);
+		canvas.draw(*me());
+		// canvas.draw(shape, pos, visible);
 	}
 
 	void update() {}
@@ -96,6 +85,18 @@ struct GameObject {
 		this->visible = false;
 	}
 };
+
+void Canvas :: draw(const GameObject& obj) {
+	if (obj.visible == false) return;
+
+	for (int i = 0; i < strlen(obj.shape); i++)
+	{
+		if (obj.pos + i < 0) continue;
+		if (obj.pos + i > size - 1) continue;
+
+		frameBuffer[obj.pos + i] = obj.shape[i];
+	}
+}
 
 // enemy
 struct Enemy : public GameObject {

@@ -1,4 +1,4 @@
 ﻿  20230426_MIDDLE503.cpp
-C:\Users\LimKyungHwa\ObjectOriented\MIDDLE_HW\MIDDLE503\20230426_MIDDLE503\20230426_MIDDLE503.cpp(77,21): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
-C:\Users\LimKyungHwa\ObjectOriented\MIDDLE_HW\MIDDLE503\20230426_MIDDLE503\20230426_MIDDLE503.cpp(125,27): warning C4018: '<=': signed 또는 unsigned가 일치하지 않습니다.
+C:\Users\LimKyungHwa\ObjectOriented\MIDDLE_HW\MIDDLE503\20230426_MIDDLE503\20230426_MIDDLE503.cpp(115,20): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+C:\Users\LimKyungHwa\ObjectOriented\MIDDLE_HW\MIDDLE503\20230426_MIDDLE503\20230426_MIDDLE503.cpp(128,31): warning C4018: '<=': signed 또는 unsigned가 일치하지 않습니다.
   20230426_MIDDLE503.vcxproj -> C:\Users\LimKyungHwa\ObjectOriented\MIDDLE_HW\MIDDLE503\Debug\20230426_MIDDLE503.exe
