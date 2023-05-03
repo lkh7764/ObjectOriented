@@ -24,17 +24,6 @@ struct Canvas {
 	int getSize() { return size; }
 
 	void draw(const GameObject& obj);
-	//void draw(const char* shape, int pos, bool visible) {
-	//	if (visible == false) return;
-
-	//	for (int i = 0; i < strlen(shape); i++)
-	//	{
-	//		if (pos + i < 0) continue;
-	//		if (pos + i > size - 1) continue;
-
-	//		frameBuffer[pos + i] = shape[i];
-	//	}
-	//}
 
 	void render() const {
 		printf("%s\r", frameBuffer);
@@ -53,7 +42,7 @@ struct GameObject {
 	bool	visible;
 
 	GameObject(const char* shape, int pos, bool visible)
-		: shape(new char[strlen(shape) + 1]), pos(pos), visible(visible) 
+		: shape(new char[strlen(shape) + 1]), pos(pos), visible(visible)
 	{
 		if (this->shape != nullptr)
 			strcpy(this->shape, shape);
@@ -71,7 +60,7 @@ struct GameObject {
 
 	GameObject* me() { return this; }
 
-	void draw(Canvas& canvas) { 
+	void draw(Canvas& canvas) {
 		canvas.draw(*me());
 		// canvas.draw(shape, pos, visible);
 	}
@@ -86,7 +75,7 @@ struct GameObject {
 	}
 };
 
-void Canvas :: draw(const GameObject& obj) {
+void Canvas::draw(const GameObject& obj) {
 	if (obj.visible == false) return;
 
 	for (int i = 0; i < strlen(obj.shape); i++)
@@ -101,8 +90,21 @@ void Canvas :: draw(const GameObject& obj) {
 // enemy
 struct Enemy : public GameObject {
 	float hp;
+	int frameCount;
+	char* emergencyShape;
+	char* originShape;
 
-	Enemy(const char* shape, int pos, bool visible) : GameObject(shape, pos, visible), hp(10.0) {}
+	Enemy(const char* shape, int pos, bool visible) : GameObject(shape, pos, visible), hp(10.0), frameCount(0),
+		emergencyShape(new char[getShapeSize() + 1]), originShape(new char[getShapeSize() + 1]) {
+		if (emergencyShape != nullptr) {
+			for (int i = 0; i < getShapeSize(); i++)
+				emergencyShape[i] = ' ';
+		}
+		emergencyShape[getShapeSize()] = '\0';
+
+		if (originShape != nullptr)
+			strcpy(originShape, getShape());
+	}
 
 	bool isColliding(int pos) const {
 		int myPos = getPos();
@@ -113,12 +115,25 @@ struct Enemy : public GameObject {
 		hp -= 0.3;
 	}
 
+	void emergency() {
+		frameCount++;
+		if (frameCount % 2 == 1)
+			setShape(emergencyShape);
+		else
+			setShape(originShape);
+	}
+
 	void update() {
+		if (hp <= 3.0) { emergency(); }
 		if (hp <= 0.0) { setVisible(false); }
 	}
 
 	~Enemy() {
 		hp = 0;
+		delete[] emergencyShape;
+		emergencyShape = nullptr;
+		delete[] originShape;
+		originShape = nullptr;
 	}
 };
 
@@ -153,9 +168,9 @@ struct Player : public GameObject {
 	int rayInterval;
 
 	Player(const char* shape, int pos, bool visible) : GameObject(shape, pos, visible),
-		frameCount(0), direction(0), distance(0), time_ray(0), rayCount(0), rayInterval(30){}
+		frameCount(0), direction(0), distance(0), time_ray(0), rayCount(0), rayInterval(30) {}
 
-	void shootRay(Enemy& enemy, Canvas& canvas) {
+	void setDirection(Enemy& enemy, Canvas& canvas) {
 		int p_pos = getPos();
 		int e_pos = enemy.getPos();
 		int p_shapeSize = getShapeSize();
@@ -178,13 +193,18 @@ struct Player : public GameObject {
 			else
 				distance = p_pos;
 		}
+	}
+
+	void shootRay(Enemy& enemy, Canvas& canvas) {
+		int p_pos = getPos();
+		int p_shapeSize = getShapeSize();
 
 		Laser* lasers = (Laser*)malloc(sizeof(Laser) * distance);
 		for (int i = 0; i < distance; i++) {
 			Laser* laser = &lasers[i];
-			if (direction == 0) 
+			if (direction == 0)
 				laser = new Laser(p_pos + p_shapeSize + i);
-			else 
+			else
 				laser = new Laser(p_pos - i - 1);
 			laser->draw(canvas);
 			laser->update(enemy);
@@ -206,8 +226,11 @@ struct Player : public GameObject {
 		frameCount++;
 		if (rayCount != 0)
 			rayInterval = 50;
-		if (frameCount >= rayInterval) 
+		if (frameCount >= rayInterval) {
+			if (frameCount == rayInterval)
+				setDirection(enemy, canvas);
 			shootRay(enemy, canvas);
+		}
 	}
 
 	~Player() {
