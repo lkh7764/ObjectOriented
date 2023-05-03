@@ -59,6 +59,7 @@ void problem1() {
 
 
 // problem2
+// 시작 직후 몇 발까지는 bullet direction에 상관없이 RtoL로 이동하는 오류 존재.
 struct GameObject;
 struct Canvas {
 	char* frameBuffer;
@@ -73,6 +74,8 @@ struct Canvas {
 			frameBuffer[i] = ' ';
 		frameBuffer[size] = '\0';
 	}
+
+	int getSize() { return size; }
 
 	void draw(const GameObject&);
 
@@ -90,8 +93,9 @@ struct Canvas {
 struct GameObject {
 	char* shape;
 	int pos;
+	bool visible;
 
-	GameObject(const char* shape, int pos) :shape(new char[strlen(shape) + 1]), pos(pos) {
+	GameObject(const char* shape, int pos) :shape(new char[strlen(shape) + 1]), pos(pos), visible(true) {
 		if (this->shape != nullptr) strcpy(this->shape, shape);
 	}
 
@@ -102,12 +106,16 @@ struct GameObject {
 	int getPos() const { return pos; }
 	void setPos(int pos) { this->pos = pos; }
 
+	bool isVisible() const { return visible; }
+	void setVisible(bool visible) { this->visible = visible; }
+
 	void draw(Canvas& canvas) const { canvas.draw(*this); }
 
 	~GameObject() {
 		delete[] shape;
 		shape = nullptr;
 		pos = 0;
+		visible = false;
 	}
 };
 
@@ -142,10 +150,15 @@ struct Bullet : public GameObject {
 
 	Bullet(const char* shape, int pos, int direciton) : GameObject(shape, pos), direction(direction), hp(10) {}
 
-	void move() {
+	void move(Canvas& canvas) {
 		int pos = getPos();
 		if (direction == 0) setPos(pos + 1);
 		else setPos(pos - 1);
+
+		if (pos + 1 >= canvas.getSize() - 1)
+			direction = 1;
+		else if (pos - 1 <= 0)
+			direction = 0;
 	}
 
 	void isColliding() {
@@ -160,14 +173,19 @@ struct Bullet : public GameObject {
 		damaged();
 	}
 
-	void damaged() { hp -= 1; }
+	void damaged() { hp -= 4; }
+
+	int getHP() { return hp; }
+	void setHP(int hp) { this->hp = hp; }
+
+	void setDirection(int direction) { this->direction = direction; }
 
 	void draw(Canvas& canvas) { canvas.draw(*this); }
 
-	void update(Mirror& m1, Mirror& m2) {
-		move();
+	void update(Canvas& canvas, Mirror& m1, Mirror& m2) {
+		move(canvas);
 		if (m1.isColliding(pos) == true || m2.isColliding(pos) == true) isColliding();
-		if (hp <= 0) delete(this);
+		if (hp <= 0)  setVisible(false);
 	}
 
 	~Bullet() {
@@ -179,9 +197,9 @@ struct Bullet : public GameObject {
 struct Player : public GameObject {
 	int frameCount;
 
-	Player(const char* shape, int pos) : GameObject(shape, pos), frameCount(0) {}
+	Player(const char* shape, int pos) : GameObject(shape, pos), frameCount(30) {}
 
-	Bullet* shootBullet() {
+	void ShootBullet(Bullet* bullets[]) {
 		int direction = rand() % 2;
 
 		char* bulletShape;
@@ -189,25 +207,35 @@ struct Player : public GameObject {
 		else bulletShape = new char[] { "<" };
 
 		int pos = 0;
-		if (direction == 0) pos = getPos() + getShapeSize() - 1;
-		else getPos();
+		if (direction == 0) pos = getPos() + getShapeSize();
+		else pos = getPos() - 1;
 
-		Bullet* bullet = new Bullet(bulletShape, pos, direction);
+		for (int i = 0; i < 100; i++) {
+			if (bullets[i] == nullptr) {
+				bullets[i] = new Bullet(bulletShape, pos, direction);
+				break;
+			}
+			if (bullets[i]->isVisible() == false) {
+				bullets[i]->setShape(bulletShape);
+				bullets[i]->setPos(pos);
+				bullets[i]->setDirection(direction);
+				bullets[i]->setHP(10);
+				bullets[i]->setVisible(true);
+				break;
+			}
+		}
 
 		delete[] bulletShape;
 		bulletShape = nullptr;
-
-		return bullet;
 	}
 
 	void draw(Canvas& canvas) { canvas.draw(*this); }
 
-	void update(Canvas& canvas) {
-		frameCount++;
-		if (frameCount == 30) {
-			Bullet* bullet = shootBullet();
-			bullet->draw(canvas);
-			frameCount = 0;
+	void update(Canvas& canvas, Bullet* bullets[]) {
+		frameCount--;
+		if (frameCount <= 0) {
+			ShootBullet(bullets);
+			frameCount = 30;
 		}
 	}
 
@@ -223,7 +251,11 @@ void problem2() {
 	Canvas* canvas = new Canvas(size);
 	Player* player = new Player("(^-^)", 50);
 	Mirror* mirror1 = new Mirror(10);
-	Mirror* mirror2 = new Mirror(80);
+	Mirror* mirror2 = new Mirror(60);
+	Bullet* bullets[100];
+
+	for (int i = 0; i < 100; i++)
+		bullets[i] = nullptr;
 
 	while (true) {
 		canvas->clear();
@@ -231,12 +263,23 @@ void problem2() {
 		mirror1->draw(*canvas);
 		mirror2->draw(*canvas);
 		player->draw(*canvas);
+		for (int i = 0; i < 100; i++) {
+			if(bullets[i] != nullptr && bullets[i]->isVisible() == true)
+				(bullets)[i]->draw(*canvas);
+		}
 
-		player->update(*canvas);
+		player->update(*canvas, bullets);
+		for (int i = 0; i < 100; i++) {
+			if (bullets[i] != nullptr && bullets[i]->isVisible() == true)
+				bullets[i]->update(*canvas, *mirror1, *mirror2);
+		}
 
 		canvas->render();
 		Sleep(100);
 	}
+
+	for (int i = 0; i < 100; i++)
+		bullets[i] = nullptr;
 
 	delete mirror1;
 	delete mirror2;

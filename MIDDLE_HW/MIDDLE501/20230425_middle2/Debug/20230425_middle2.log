@@ -1,4 +1,7 @@
 ﻿  20230425.cpp
-C:\Users\LimKyungHwa\source\repos\20230425_middle2\20230425_middle2\20230425.cpp(38,27): warning C4305: '초기화 중': 'double'에서 'float'(으)로 잘립니다.
-C:\Users\LimKyungHwa\source\repos\20230425_middle2\20230425_middle2\20230425.cpp(39,30): warning C4305: '초기화 중': 'double'에서 'float'(으)로 잘립니다.
-  20230425_middle2.vcxproj -> C:\Users\LimKyungHwa\source\repos\20230425_middle2\Debug\20230425_middle2.exe
+C:\Users\LimKyungHwa\ObjectOriented\MIDDLE_HW\MIDDLE501\20230425_middle2\20230425.cpp(40,27): warning C4305: '초기화 중': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\LimKyungHwa\ObjectOriented\MIDDLE_HW\MIDDLE501\20230425_middle2\20230425.cpp(41,30): warning C4305: '초기화 중': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\LimKyungHwa\ObjectOriented\MIDDLE_HW\MIDDLE501\20230425_middle2\20230425.cpp(119,26): warning C4018: '>': signed 또는 unsigned가 일치하지 않습니다.
+C:\Users\LimKyungHwa\ObjectOriented\MIDDLE_HW\MIDDLE501\20230425_middle2\20230425.cpp(201,20): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+C:\Users\LimKyungHwa\ObjectOriented\MIDDLE_HW\MIDDLE501\20230425_middle2\20230425.cpp(238,6): warning C4101: 'canvasSize' :참조되지 않은 지역 변수입니다.
+  20230425_middle2.vcxproj -> C:\Users\LimKyungHwa\ObjectOriented\MIDDLE_HW\MIDDLE501\Debug\20230425_middle2.exe
